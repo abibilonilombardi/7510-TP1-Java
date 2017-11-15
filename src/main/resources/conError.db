@@ -6,7 +6,7 @@ varon(alejandro).
 mujer(maria) .
 mujer(cecilia).
 padre(juan, pepe).
-padre(juan, pepa).
+padre(juan, pep
 padre(hector, maria).
 padre(roberto, alejandro).
 padre(roberto, cecilia).
@@ -17,3 +17,8 @@ hermano(roberto, nicolas).
 varon ( nicolas ) .
 tio(X, Y, Z):- varon(X),	hermano(X, Z),padre(Z, Y).
 tia(X, Y, Z):- mujer(X),	hermano(X, Z),padre(Z, Y).
+padre(hector,juan).
+nieto(X,Y,Z):- varon(X), hijo(X,Z), padre(Y,Z).
+primo(X,Y,Z,W):- varon(X), hijo(X,Z), hijo(Y,W), hermano(Z,W).
+padre(pepe, maria).
+bisnieta(X,Y,Z,W) :- mujer(X),   hija(X,Z), nieto(Z,Y,W).

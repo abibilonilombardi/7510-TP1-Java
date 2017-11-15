@@ -4,11 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Rule extends Definicion {
+    private BaseDeDatos Contexto;
     private List<Definicion> Facts;
 
     public Rule(String Nombre, String[] Parametros) {
         super(Nombre, Parametros);
         this.Facts = new ArrayList<Definicion>();
+    }
+
+    public void SetContexto(BaseDeDatos contexto) {
+        this.Contexto = contexto;
+    }
+
+    public void AgregarDefinicion(Definicion definicion){
+        Facts.add(definicion);
     }
 
     public boolean Evaluar(Definicion queryAEvaluar) {
@@ -26,9 +35,4 @@ public class Rule extends Definicion {
         }
         return false;
     }
-
-    public void AgregarDefinicion(Definicion definicion){
-        Facts.add(definicion);
-    }
-
 }

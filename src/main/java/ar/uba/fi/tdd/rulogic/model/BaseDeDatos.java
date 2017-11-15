@@ -23,7 +23,8 @@ public class BaseDeDatos {
         try (Stream<String> stream = Files.lines(Paths.get(archivo))) {
             stream.forEach(lines::add);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("ERROR: no se encuentra el archivo");
+            lines.clear();
         }
         return lines;
     }
@@ -32,11 +33,18 @@ public class BaseDeDatos {
         List<String> lineasArchivo = this.ParsearArchivo(archivo);
 
         for (String linea : lineasArchivo) {
-            this.BDD.add(ParsearString(linea));
+            Definicion definicion;
+            try {
+                definicion = ParsearString(linea);
+                this.BDD.add(definicion);
+            } catch (SentenciaInvalidaException e) {
+                System.out.println("ERROR: el archivo contiene un error en la linea: [" + (this.BDD.size()+1) + "] " + linea);
+                this.BDD.clear();
+            }
         }
     }
 
-    public Definicion ParsearString(String sentencia) {
+    public Definicion ParsearString(String sentencia) throws SentenciaInvalidaException {
         Pattern sintaxis = Pattern.compile("([a-zA-Z\\s]*)\\(([a-zA-Z\\s,]*)\\)\\s*[.|:]?");
 
         Matcher matcher = sintaxis.matcher(sentencia);
@@ -51,26 +59,23 @@ public class BaseDeDatos {
                 facts.add(matcher.group(0));
             }
 
-            Definicion definicion;
             if (facts.isEmpty()) {
-                definicion = new Fact(nombre, parametros.split(","));
+                return new Fact(nombre, parametros.split(","));
             } else {
                 Rule rule = new Rule(nombre, parametros.split(","));
                 for (String str : facts) {
                     rule.AgregarDefinicion(ParsearString(str));
                 }
-                definicion = rule;
+                rule.SetContexto(this);
+                return rule;
             }
-            definicion.Contexto = this;
-            return definicion;
         }
-        return null; //
+        throw new SentenciaInvalidaException();
     }
 
     public boolean EstaContenida(Definicion definicion) {
         for (Definicion def : this.BDD) {
-            boolean e = def.Evaluar(definicion);
-            if (e) {
+            if (def.Evaluar(definicion)) {
                 return true;
             }
         }
