@@ -1,8 +1,8 @@
 package ar.uba.fi.tdd.rulogic.model;
 
-public class Fact extends Definicion {
+public class Hecho extends Definicion {
 
-    public Fact(String Nombre, String[] Parametros) {
+    public Hecho(String Nombre, String[] Parametros) {
         super(Nombre, Parametros);
     }
 
@@ -16,10 +16,10 @@ public class Fact extends Definicion {
         this.Parametros = parametrosReemplazados;
     }
 
-    public boolean Evaluar(Definicion queryAEvaluar) {
-        if (this.Nombre.equals(queryAEvaluar.Nombre) && this.Parametros.length == queryAEvaluar.Parametros.length) {
+    public boolean Evaluar(Definicion consultaAEvaluar) {
+        if (this.Nombre.equals(consultaAEvaluar.Nombre) && this.Parametros.length == consultaAEvaluar.Parametros.length) {
             for (int i = 0; i < this.Parametros.length; i++) {
-                if (!this.Parametros[i].equals(queryAEvaluar.Parametros[i])) {
+                if (!this.Parametros[i].equals(consultaAEvaluar.Parametros[i])) {
                     return false;
                 }
             }
@@ -27,7 +27,6 @@ public class Fact extends Definicion {
         }
         return false;
     }
-
 
 }
 

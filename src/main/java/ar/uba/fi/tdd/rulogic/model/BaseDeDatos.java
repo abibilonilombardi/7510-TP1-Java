@@ -5,76 +5,50 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+/**
+ * Contiene todas las Definiciones generadas por el Parser a partir del archivo.
+ * Si el archivo tiene errores de sintaxis se imprime por pantalla y todas las
+ * consultas daran false.
+ */
+public class BaseDeDatos implements ContenedorDeDefiniciones {
+    private List<Definicion> Definiciones;
+    private Parser Parser;
 
-public class BaseDeDatos {
-    private List<Definicion> BDD;
-
-    public BaseDeDatos(String archivo) {
-        this.BDD = new ArrayList<Definicion>();
-        this.ParsearLista(archivo);
+    public BaseDeDatos( Parser parser) {
+        this.Definiciones = new ArrayList<>();
+        this.Parser = parser;
+        this.Parser.EstablecerContexto(this);
     }
 
-    private List<String> ParsearArchivo(String archivo) {
-        List<String> lines = new ArrayList<>();
-        try (Stream<String> stream = Files.lines(Paths.get(archivo))) {
-            stream.forEach(lines::add);
+    private List<String> ObtenerLineas(String archivo) {
+        List<String> lineas = new ArrayList<>();
+        try (Stream<String> lineasArchivo = Files.lines(Paths.get(archivo))) {
+            lineasArchivo.forEach(lineas::add);
         } catch (IOException e) {
             System.out.println("ERROR: no se encuentra el archivo");
-            lines.clear();
+            lineas.clear();
         }
-        return lines;
+        return lineas;
     }
 
-    private void ParsearLista(String archivo) {
-        List<String> lineasArchivo = this.ParsearArchivo(archivo);
-
-        for (String linea : lineasArchivo) {
+    public void CargarDesdeArchivo(String archivo) {
+        for (String linea : this.ObtenerLineas(archivo)) {
             Definicion definicion;
             try {
-                definicion = ParsearString(linea);
-                this.BDD.add(definicion);
+                definicion = this.Parser.Parsear(linea);
+                this.Definiciones.add(definicion);
             } catch (SentenciaInvalidaException e) {
-                System.out.println("ERROR: el archivo contiene un error en la linea: [" + (this.BDD.size()+1) + "] " + linea);
-                this.BDD.clear();
+                System.out.println("ERROR: el archivo contiene un error en la linea: [" + (this.Definiciones.size() + 1) + "] " + linea);
+                this.Definiciones.clear();
             }
         }
     }
 
-    public Definicion ParsearString(String sentencia) throws SentenciaInvalidaException {
-        Pattern sintaxis = Pattern.compile("([a-zA-Z\\s]*)\\(([a-zA-Z\\s,]*)\\)\\s*[.|:]?");
-
-        Matcher matcher = sintaxis.matcher(sentencia);
-
-        if (matcher.find()) {
-            String nombre = matcher.group(1);
-            String parametros = matcher.group(2);
-
-            List<String> facts = new ArrayList<>();
-
-            while (matcher.find()) {
-                facts.add(matcher.group(0));
-            }
-
-            if (facts.isEmpty()) {
-                return new Fact(nombre, parametros.split(","));
-            } else {
-                Rule rule = new Rule(nombre, parametros.split(","));
-                for (String str : facts) {
-                    rule.AgregarDefinicion(ParsearString(str));
-                }
-                rule.SetContexto(this);
-                return rule;
-            }
-        }
-        throw new SentenciaInvalidaException();
-    }
-
-    public boolean EstaContenida(Definicion definicion) {
-        for (Definicion def : this.BDD) {
+    @Override
+    public boolean Contiene(Definicion definicion) {
+        for (Definicion def : this.Definiciones) {
             if (def.Evaluar(definicion)) {
                 return true;
             }

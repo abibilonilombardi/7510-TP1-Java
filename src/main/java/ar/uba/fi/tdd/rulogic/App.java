@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 public class App {
     public static void main(String[] args) {
-        System.out.println("I shall answer all your questions!");
+        //System.out.println("I shall answer all your questions!");
 
         Scanner scanner = new Scanner(System.in);
 
@@ -20,6 +20,7 @@ public class App {
         while(true){
             System.out.println("Consulta: ");
             consulta = scanner.nextLine();
+
             if (consulta.equals("salir")){break;}
             System.out.println(">" + Interprete.answer(consulta));
         }

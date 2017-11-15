@@ -1,6 +1,10 @@
 package ar.uba.fi.tdd.rulogic.model;
 
-
+/**
+ * Generalizacion de Hechos y Reglas
+ * Composite: Las Hechos son las hojas y las Reglas son los contenedores de Definiciones
+ * (Las reglas pueden estar compuestas de Hechos y de otras Reglas)
+ */
 public abstract class Definicion {
     protected String Nombre;
     protected String[] Parametros;
@@ -18,5 +22,5 @@ public abstract class Definicion {
         return parametrosSinEspacios;
     }
 
-    public abstract boolean Evaluar(Definicion queryAEvaluar);
+    public abstract boolean Evaluar(Definicion consultaAEvaluar);
 }
